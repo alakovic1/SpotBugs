@@ -29,7 +29,11 @@ public class SpotBugsSkripta {
 		final File folder = new File(".");
         for (final File fileEntry : folder.listFiles()) {
 	        if (fileEntry.isDirectory()) {
-	            projekti.add(fileEntry.getName());
+	        	//System.out.println(fileEntry.getName());
+	        	//u slucaju da se stavi na git...
+	        	if(!fileEntry.getName().equals(".git")){
+	            	projekti.add(fileEntry.getName());
+	        	}
 	        }
 	    }
 
