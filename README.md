@@ -6,21 +6,20 @@
 
 ## Prerequisites
 
-1. Java 8 installed (not sure how it works on higher Java versions)
+1. Java 8 installed (it should work on higher versions too)
 2. Android Studio installed, or Gradle (must be version 5+)
 3. have projects you want to test
 
 ## Running SpotBugs
 
 1. Clone this repository (or fork and clone)
-2. Delete project "NOVAapp" if you don't want to test it
-3. Move all your projects you want to test in this folder, or move .java script to directory your projects are in
-4. Make sure no other directories are there
-5. Open Terminal in this/that directory and run commands:
+2. Add paths to all the projects you want to test in putanje.txt
+3. putanje.txt and script need to be in the same directory
+4. Open Terminal in that directory and run commands:
     1. javac SpotBugsSkripta.java
     2. java SpotBugsSkripta
-6. Wait to see if BUILDs are SUCCESSFUL (for all of your projects)
-7. HTML reports will be in every project in project -> app -> build -> SpotBugsReports!!
+5. Wait to see if BUILDs are SUCCESSFUL (for all of your projects)
+6. HTML reports will be in every project in project -> app -> build -> SpotBugsReports!!
 
 > You can run it as many times as you want to, no need to delete code by hand because it is not going to insert the same code several times. It should be fine every time you try.
 
