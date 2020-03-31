@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-//NAPOMENA: ovu skriptu dodati u folder gdje su svi projekti i omoguciti da nema nekih dodatnih foldera koji nisu projekti
+//kreirati putanje.txt file sa putanjama na sve projekte i staviti ga u isti direktorij kao skripta
 //SVI PROJEKTI MORAJU IMATI MIN VERZIJU GRADLEA 5, jer SpotBugs nize ne podrzava
-//preci u taj direktorij i pozvati komande za javu
+//iz tog direktorija gdje su skripta i txt pozvati:
 // 1. javac SpotBugsSkripta.java
 // 2. java SpotBugsSkripta
 //u svaki projekat u tom folderu ce biti testiran SpotBugs i izvjestaj ce biti kreiran
@@ -21,21 +21,13 @@ import java.io.InputStreamReader;
 
 public class SpotBugsSkripta {
 
+	public static ArrayList<String> projekti = new ArrayList<String>();
+
 	public static void main(String[] args) {
 
-		ArrayList<String> projekti = new ArrayList<String>();
-
-		//citanje svih projekata iz trenutnog foldera
-		final File folder = new File(".");
-        for (final File fileEntry : folder.listFiles()) {
-	        if (fileEntry.isDirectory()) {
-	        	//System.out.println(fileEntry.getName());
-	        	//u slucaju da se stavi na git...
-	        	if(!fileEntry.getName().equals(".git")){
-	            	projekti.add(fileEntry.getName());
-	        	}
-	        }
-	    }
+	    //pozivanje funkcije da se ocitaju sve putanje projekata
+	    //NAPOMENA: promijeniti putanju txt fajla ako nije u istom direktoriju kao i skripta
+	    citajPutanje("putanje.txt");
 
 	    //pozivanje funkcija za dopisivanje u Gradle i pozivanje spotbugsa za svaki projekat
 	    for(int i = 0; i < projekti.size(); i++){
@@ -47,25 +39,46 @@ public class SpotBugsSkripta {
 
 	}
 
+	private static void citajPutanje(String putanja){
+
+		//citanja putanja svih projekata iz putanje.txt
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(putanja));
+			String line = reader.readLine();
+			while (line != null) {
+				projekti.add(line);
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	private static void upisiUGradle(String projekat){
 
 		//dodavanje u build.gradle projekta
 		String gradleProjekatPutanja = projekat + "/build.gradle";
 		String gradleProjekatTekst = "\nbuildscript {\nrepositories {\nmaven {\nurl \"https://plugins.gradle.org/m2/\"\n}\n}\ndependencies {\nclasspath \"com.github.spotbugs:spotbugs-gradle-plugin:2.0.1\"\n}\n}";
-		if(daLiTrebaDodatiSpotBugsUGradleProjekat(gradleProjekatPutanja) == false){
+
+		if(daLiTrebaDodatiSpotBugsUGradle(gradleProjekatPutanja, "classpath \"com.github.spotbugs:spotbugs-gradle-plugin:2.0.1\"") == false){
 			dodajTekst(gradleProjekatPutanja, gradleProjekatTekst);
 		}
 
 		//dodavanje u build.gradle app
 		String gradleAppPutanja = projekat + "/app/build.gradle";
-		String gradleAppTekst = "\napply plugin: \"com.github.spotbugs\"\nsourceSets {\nmain {\njava.srcDirs = []\n}\n}\nspotbugs {\nignoreFailures = true\nreportsDir = file(\"$project.buildDir/SpotBugsReports\")\neffort = \"max\"\nreportLevel = \"high\"\n}\ntasks.withType(com.github.spotbugs.SpotBugsTask) {\ndependsOn 'assembleDebug'\nclasses = files(\"$project.buildDir/intermediates/javac\")\nsource = fileTree('src/main/java')\nreports {\nhtml.enabled = true\nxml.enabled = false\n}\n}";
-		if(daLiTrebaDodatiSpotBugsUGradleApp(gradleAppPutanja) == false){
+		String gradleAppTekst = "\napply plugin: \"com.github.spotbugs\"\nsourceSets {\nmain {\njava.srcDirs = []\n}\n}\nspotbugs {\ntoolVersion = \'4.0.1\'\nignoreFailures = true\nreportsDir = file(\"$project.buildDir/SpotBugsReports\")\neffort = \"max\"\nreportLevel = \"high\"\n}\ntasks.withType(com.github.spotbugs.SpotBugsTask) {\ndependsOn 'assembleDebug'\nclasses = files(\"$project.buildDir/intermediates/javac\")\nsource = fileTree('src/main/java')\nreports {\nhtml.enabled = true\nxml.enabled = false\n}\n}";
+
+		if(daLiTrebaDodatiSpotBugsUGradle(gradleAppPutanja, "apply plugin: \"com.github.spotbugs\"") == false){
 			dodajTekst(gradleAppPutanja, gradleAppTekst);
 		}
 
+
 	}
 
-	public static boolean daLiTrebaDodatiSpotBugsUGradleProjekat(String putanja) {
+	public static boolean daLiTrebaDodatiSpotBugsUGradle(String putanja, String linija) {
 
 		//citanje iz build.gradle i ispitivanje da li je vec spotbugs dodan
 		BufferedReader reader;
@@ -75,28 +88,7 @@ public class SpotBugsSkripta {
 			while (line != null) {
 				//prekida se ako postoji ova linija jer je bitna
 				//ako ona postoji, znaci da je spotbugs dodan u projekat kroz ovu skriptu
-				if(line.equals("classpath \"com.github.spotbugs:spotbugs-gradle-plugin:2.0.1\"")) return true;
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return false;
-
-	}
-
-	public static boolean daLiTrebaDodatiSpotBugsUGradleApp(String putanja) {
-
-		//citanje iz app/build.gradle i ispitivanje da li je vec spotbugs dodan
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(putanja));
-			String line = reader.readLine();
-			while (line != null) {
-				//prekida se ako postoji ova linija jer je bitna
-				//ako ona postoji, znaci da je spotbugs dodan u projekat kroz ovu skriptu
-				if(line.equals("apply plugin: \"com.github.spotbugs\"")) return true;
+				if(line.equals(linija)) return true;
 				line = reader.readLine();
 			}
 			reader.close();
