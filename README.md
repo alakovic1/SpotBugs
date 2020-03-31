@@ -26,8 +26,6 @@
 
 ## Contributing to SpotBugs
 
-To contribute to Payment server, follow these steps:
-
 1. Clone this repository (or fork and clone)
 2. Create a new branch: `git checkout -b <branch_name>`.
 3. Make your changes and commit them: `git commit -m '<commit_message>'`
