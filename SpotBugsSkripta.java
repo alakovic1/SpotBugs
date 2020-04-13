@@ -36,7 +36,8 @@ public class SpotBugsSkripta {
 		}
 
 		System.out.println("Izvjestaji za svaki projekat pojedinacno se nalaze u projekat -> app -> build -> SpotBugsReports!!");
-
+		createFinalReport();
+		dodajTekst("finalReport.html", finalReportString());
 	}
 
 	private static void citajPutanje(String putanja){
@@ -137,6 +138,112 @@ public class SpotBugsSkripta {
         	//izuzetak
     	}
     	
+	}
+
+	private static void createFinalReport(){
+		try {  
+      		File myObj = new File("finalReport.html");  
+      		myObj.delete(); //u slucaju da fajl vec postoji da se obrise i opet kreira
+      		if (myObj.createNewFile()) {  
+        	System.out.println("File created: " + myObj.getName());  
+      	} else {  
+        	System.out.println("File " + myObj.getName() + " already exists.");  
+      	}  
+    	} catch (IOException e) {
+      		System.out.println("An error occurred.");
+      		e.printStackTrace();  
+    	} 
+	}
+
+	private static String finalReportString(){
+		String html = "<!DOCTYPE html" + 
+					  "PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
+					  "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+					   "<head>" +
+					      "<title>SpotBugs Report</title>" +
+					      "<style type=\"text/css\">" +
+					    ".tablerow0 {" + 
+					      "background: #EEEEEE;" + 
+					    "}" + 
+
+					    ".tablerow1 {" + 
+					      "background: white;" +
+					    "}" +
+
+					    ".detailrow0 {" + 
+					      "background: #EEEEEE;" + 
+					    "}" + 
+
+					    ".detailrow1 {" + 
+					      "background: white;" + 
+					    "}" +
+
+					    ".tableheader {" +
+					      "background: #b9b9fe;" + 
+					      "font-size: larger;" +
+					    "}" +
+
+					    ".tablerow0:hover, .tablerow1:hover {" +
+					      "background: #aaffaa;" +
+					    "}" + 
+
+					    ".priority-1 {" +
+					        "color: red;" +
+					        "font-weight: bold;" + 
+					    "}" +
+					    ".priority-2 {" + 
+					        "color: orange;" +
+					        "font-weight: bold;" +
+					    "}" +
+					    ".priority-3 {" +
+					        "color: green;" +
+					        "font-weight: bold;" +
+					    "}" +
+					    ".priority-4 {" +
+					        "color: blue;" +
+					        "font-weight: bold;" +
+					    "}" +
+					    "</style>" +
+					      "<script type=\"text/javascript\">" +
+					      "function toggleRow(elid) {" +
+					        "if (document.getElementById) {" +
+					          "element = document.getElementById(elid);" +
+					          "if (element) {" +
+					            "if (element.style.display == 'none') {" +
+					              "element.style.display = 'block';" +
+					              //window.status = 'Toggle on!';
+					            "} else {" +
+					              "element.style.display = 'none';" +
+					              //window.status = 'Toggle off!';
+					            "}" +
+					          "}" +
+					        "}" +
+					      "}" +
+					    "</script>" +
+					   "</head>" +
+					   "<body>" +
+					      "<h1>" +
+					         "<a href=\"https://spotbugs.github.io/\">SpotBugs</a> Report" +
+					      "<h3> >> for multiple Android Studio projects << </h3>" +
+					      "</h1>" + 
+					      "<h2>Basic Information</h2>" + 
+					      "<p>Project: " + 
+					    "project ':app' (main)</p>" +
+					      "<p>SpotBugs version: 4.0.1</p>" + 
+					      "<br>" +
+					      "<h3>All tested projects: </h3>" + 
+					      "<p>";
+					      for(int i = 0; i < projekti.size(); i++){
+					      	html += "<p><span class=\"tableheader\">" + projekti.get(i); 
+					        html += "<br>";
+					        html += "</span></p>";
+					        html += "<a href=\"file://" + projekti.get(i) + "/app/build/SpotBugsReports/main.html\">See full report...</a>";
+					      }
+					      html += "</p>" +
+					   "</body>" + 
+					"</html>";
+
+	return html;
 	}
 
 }
