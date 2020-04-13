@@ -20,6 +20,7 @@
     2. java SpotBugsSkripta
 5. Wait to see if BUILDs are SUCCESSFUL (for all of your projects)
 6. HTML reports will be in every project in project -> app -> build -> SpotBugsReports!!
+7. Script creates finalReport.html where you can see total amount of warnings for every project and also access all the individual project reports.
 
 > You can run it as many times as you want to, no need to delete code by hand because it is not going to insert the same code several times. It should be fine every time you try.
 
