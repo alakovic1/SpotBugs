@@ -156,93 +156,84 @@ public class SpotBugsSkripta {
 	}
 
 	private static String finalReportString(){
-		String html = "<!DOCTYPE html" + 
-					  "PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
-					  "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
-					   "<head>" +
-					      "<title>SpotBugs Report</title>" +
-					      "<style type=\"text/css\">" +
-					    ".tablerow0 {" + 
-					      "background: #EEEEEE;" + 
-					    "}" + 
-
-					    ".tablerow1 {" + 
-					      "background: white;" +
-					    "}" +
-
-					    ".detailrow0 {" + 
-					      "background: #EEEEEE;" + 
-					    "}" + 
-
-					    ".detailrow1 {" + 
-					      "background: white;" + 
-					    "}" +
-
-					    ".tableheader {" +
-					      "background: #b9b9fe;" + 
-					      "font-size: larger;" +
-					    "}" +
-
-					    ".tablerow0:hover, .tablerow1:hover {" +
-					      "background: #aaffaa;" +
-					    "}" + 
-
-					    ".priority-1 {" +
-					        "color: red;" +
-					        "font-weight: bold;" + 
-					    "}" +
-					    ".priority-2 {" + 
-					        "color: orange;" +
-					        "font-weight: bold;" +
-					    "}" +
-					    ".priority-3 {" +
-					        "color: green;" +
-					        "font-weight: bold;" +
-					    "}" +
-					    ".priority-4 {" +
-					        "color: blue;" +
-					        "font-weight: bold;" +
-					    "}" +
-					    "</style>" +
-					      "<script type=\"text/javascript\">" +
-					      "function toggleRow(elid) {" +
-					        "if (document.getElementById) {" +
-					          "element = document.getElementById(elid);" +
-					          "if (element) {" +
-					            "if (element.style.display == 'none') {" +
-					              "element.style.display = 'block';" +
-					              //window.status = 'Toggle on!';
-					            "} else {" +
-					              "element.style.display = 'none';" +
-					              //window.status = 'Toggle off!';
-					            "}" +
-					          "}" +
-					        "}" +
-					      "}" +
-					    "</script>" +
-					   "</head>" +
-					   "<body>" +
-					      "<h1>" +
-					         "<a href=\"https://spotbugs.github.io/\">SpotBugs</a> Report" +
-					      "<h3> >> for multiple Android Studio projects << </h3>" +
-					      "</h1>" + 
-					      "<h2>Basic Information</h2>" + 
-					      "<p>Project: " + 
-					    "project ':app' (main)</p>" +
-					      "<p>SpotBugs version: 4.0.1</p>" + 
-					      "<br>" +
-					      "<h3>All tested projects: </h3>" + 
-					      "<p>";
-					      for(int i = 0; i < projekti.size(); i++){
-					      	html += "<p><span class=\"tableheader\">" + projekti.get(i); 
-					        html += "<br>";
-					        html += "</span></p>";
-					        html += "<a href=\"file://" + projekti.get(i) + "/app/build/SpotBugsReports/main.html\">See full report...</a>";
+		String html = "<!DOCTYPE html\n" + 
+					  "PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
+					  "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+					   "<head>\n" +
+					    "<title>SpotBugs Final Report</title>\n" +
+					    "<style type=\"text/css\">\n" +
+						    "body {\n" +
+						      "text-align: center;\n" +
+							"}\n" + 
+						    ".greydiv {\n" + 
+						      "background: #EEEEEE;\n" + 
+						      "width: 850px;\n" +
+						      "margin: 0 auto;\n" +
+						      "padding: 10px;" +
+						    "}\n" +
+						    ".purplename {\n" +
+						      "background: #b9b9fe;\n" + 
+						      "font-size: larger;\n" +
+						    "}\n" +
+						    "#myBtn {\n" +
+							  "display: none;\n" +
+							  "position: fixed;\n" +
+							  "bottom: 20px;\n" +
+							  "right: 30px;\n" +
+							  "font-size: 15px;\n" +
+							  "border: 1px solid black;\n" +
+							  "background-color: #b9b9fe;\n" +
+							  "color: black;\n" +
+							  "padding: 15px;\n" +
+							  "border-radius: 4px;\n" +
+							"}\n" +
+					    "</style>\n" +
+					   "</head>\n" +
+					   "<body>\n" +
+					   "<div class=\"greydiv\">\n" +
+					      "<h1>\n" +
+					         "<a href=\"https://spotbugs.github.io/\">SpotBugs</a> Final Report\n" +
+					      "<h3> >> for multiple Android Studio projects << </h3>\n" +
+					      "</h1>\n" + 
+					      "<h2>Basic Information</h2>\n" + 
+					      "<p>Project: \n" + 
+					    "project ':app' (main)</p>\n" +
+					      "<p>SpotBugs version: 4.0.1</p>\n" + 
+					      "<br>\n" +
+					      "<h3>All tested projects: </h3>\n" + 
+					      "<p>\n";
+					      if(projekti.size() == 0){
+					      	html += "<p><u>No projects!!</u></p>";
+					      	html += "<p>Please fill putanje.txt file with paths to projects you want to test.</p>";
 					      }
-					      html += "</p>" +
-					   "</body>" + 
-					"</html>";
-
+					      for(int i = 0; i < projekti.size(); i++){
+					      	html += "<p><span class=\"purplename\">" + projekti.get(i) + "\n";
+					        html += "<br>\n";
+					        html += "</span>\n</p>\n";
+					        html += "<a href=\"file://" + projekti.get(i) + "/app/build/SpotBugsReports/main.html\">See full report...</a>\n";
+					      }
+					      html += "</p>\n" +
+					   "<button onclick=\"topFunction()\" id=\"myBtn\" title=\"Go to top\">Back to top</button>\n" +
+					   "</div>\n" +
+					   "<script>\n" +
+							"var mybutton = document.getElementById(\"myBtn\");\n" +
+							"window.onscroll = function(){\n" +
+							"scrollFunction()\n" +
+							"};\n" +
+							"function scrollFunction(){\n" +
+							  "if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20){\n" +
+							    "mybutton.style.display = \"block\";\n" +
+							  "}else{\n" +
+							    "mybutton.style.display = \"none\";\n" +
+							  "}\n" +
+							"}\n" +
+							"function topFunction(){\n" +
+							  "document.body.scrollTop = 0;\n" +
+							  "document.documentElement.scrollTop = 0;\n" +
+							"}\n" +
+						"</script>\n" +
+					   "</body>\n" + 
+					"</html>\n";
 	return html;
 	}
 
