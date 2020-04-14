@@ -1,15 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.util.*;
+import java.io.*;
 
 //kreirati putanje.txt file sa putanjama na sve projekte i staviti ga u isti direktorij kao skripta
 //SVI PROJEKTI MORAJU IMATI MIN VERZIJU GRADLEA 5, jer SpotBugs nize ne podrzava
@@ -175,6 +165,19 @@ public class SpotBugsSkripta {
 						      "background: #b9b9fe;\n" + 
 						      "font-size: larger;\n" +
 						    "}\n" +
+						    "a.spotbugslink {\n" +
+						      "color: #4B0082;\n" +
+						      "text-decoration:underline;\n" +
+						    "}\n" +
+						    "a.link {\n" +
+						      "font-size: larger;\n" +
+						      "color: #4B0082;\n" +
+						      "text-decoration:underline;\n" +
+						    "}\n" +
+						    "a {\n" +
+						      "color: black;\n" +
+						      "text-decoration: none;\n" + 
+						    "}\n" +
 						    "#myBtn {\n" +
 							  "display: none;\n" +
 							  "position: fixed;\n" +
@@ -192,7 +195,7 @@ public class SpotBugsSkripta {
 					   "<body>\n" +
 					   "<div class=\"greydiv\">\n" +
 					      "<h1>\n" +
-					         "<a href=\"https://spotbugs.github.io/\">SpotBugs</a> Final Report\n" +
+					         "<a href=\"https://spotbugs.github.io/\" class=\"spotbugslink\">SpotBugs</a> Final Report\n" +
 					      "<h3> >> for multiple Android Studio projects << </h3>\n" +
 					      "</h1>\n" + 
 					      "<h2>Basic Information</h2>\n" + 
@@ -210,7 +213,10 @@ public class SpotBugsSkripta {
 					      	html += "<p><span class=\"purplename\">" + projekti.get(i) + "\n";
 					        html += "<br>\n";
 					        html += "</span>\n</p>\n";
-					        html += "<a href=\"file://" + projekti.get(i) + "/app/build/SpotBugsReports/main.html\">See full report...</a>\n";
+					        html += "<p>"+ getWarnings(projekti.get(i) + "/app/build/SpotBugsReports/main.html").get(0) + "</p>";
+					        html += "<p><b>Total warnings: </b>" + getWarnings(projekti.get(i) + "/app/build/SpotBugsReports/main.html").get(1) + "</p>";
+					        html += "<p>" + getWarnings(projekti.get(i) + "/app/build/SpotBugsReports/main.html").get(2) + "</p>";
+					        html += "<a href=\"file://" + projekti.get(i) + "/app/build/SpotBugsReports/main.html\" class=\"link\">See full report...</a>\n";
 					      }
 					      html += "</p>\n" +
 					   "<button onclick=\"topFunction()\" id=\"myBtn\" title=\"Go to top\">Back to top</button>\n" +
@@ -235,6 +241,58 @@ public class SpotBugsSkripta {
 					   "</body>\n" + 
 					"</html>\n";
 	return html;
+	}
+
+	private static ArrayList<String> getWarnings(String path){
+		ArrayList<String> list = new ArrayList<String>();
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(path));
+			String line = reader.readLine();
+			String ukupni = "";
+			String ukupno = "";
+			String total = "";
+			while (line != null) {
+
+				//vraca koliko je linija koda analizirano -- RADIII
+				if(line.equals("      <h2>Metrics</h2>")){
+					ukupno = reader.readLine() + reader.readLine() + reader.readLine();
+				}
+
+				//vraca koliko je ukupno warninga -- RADIII
+				if(line.equals("               <b>Total</b>")) {
+					line = reader.readLine();
+					line = reader.readLine();
+					line = reader.readLine();
+					total = line;
+				}
+
+				//vraca contents -- RADIII
+				if(line.equals("      <h2>Contents</h2>")){
+					line = reader.readLine();
+					while(!line.equals("      <h1>Summary</h1>")){
+						if(!line.equals("      <ul>") && !line.equals("      </ul>") && !line.equals("         <li>") && !line.equals("         </li>") && !line.equals("            <a href=\"#Details\">Details</a>")){
+							ukupni += "<li>";
+							ukupni += line;
+							ukupni += "</li>";
+						}
+						line = reader.readLine();
+					}
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+
+			list.add(ukupno);
+			list.add(total);
+			list.add(ukupni);
+
+			return list;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
