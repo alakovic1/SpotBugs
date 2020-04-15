@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.awt.Desktop;
 
 //kreirati putanje.txt file sa putanjama na sve projekte i staviti ga u isti direktorij kao skripta
 //SVI PROJEKTI MORAJU IMATI MIN VERZIJU GRADLEA 5, jer SpotBugs nize ne podrzava
@@ -28,6 +29,7 @@ public class SpotBugsSkripta {
 		System.out.println("Izvjestaji za svaki projekat pojedinacno se nalaze u projekat -> app -> build -> SpotBugsReports!!");
 		createFinalReport();
 		dodajTekst("finalReport.html", finalReportString());
+		openFinalReport();
 	}
 
 	private static void citajPutanje(String putanja){
@@ -293,6 +295,24 @@ public class SpotBugsSkripta {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private static void openFinalReport(){
+		try{
+	      File file = new File("finalReport.html");
+	        
+	        //first check if Desktop is supported by Platform or not
+	        if(!Desktop.isDesktopSupported()){
+	            System.out.println("Desktop is not supported");
+	            return;
+	        }
+	        
+	        Desktop desktop = Desktop.getDesktop();
+	        if(file.exists()) desktop.open(file);
+    	}
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
