@@ -209,7 +209,7 @@ public class SpotBugs {
 						      "background: #EEEEEE;\n" + 
 						      "width: 850px;\n" +
 						      "margin: 0 auto;\n" +
-						      "padding: 10px;" +
+						      "padding: 10px;\n" +
 						    "}\n" +
 						    ".purplename {\n" +
 						      "background: #b9b9fe;\n" + 
