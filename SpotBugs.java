@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 import java.awt.Desktop;
 
-//kreirati paths.txt file sa putanjama na sve projekte i staviti ga u isti direktorij kao skripta
+//kreirati paths.txt file sa putanjama na sve projekte i staviti ga u isti direktorij kao skripta (ako već nije kreiran)
 //SVI PROJEKTI MORAJU IMATI MIN VERZIJU GRADLEA 5, jer SpotBugs nize ne podrzava
 //iz tog direktorija gdje su skripta i txt pozvati:
 // 1. javac SpotBugs.java
@@ -15,8 +15,9 @@ import java.awt.Desktop;
 
 //NAPOMENA: 
 //prije nego pokrenete skriptu provjerite:
-// 1. verziju Gradle-a u gradle -> wrapper -> gradle-wrapper.properties
-// 2. da li je putanja do Android SDK ispravna u local.properties
+// 1. da li je projekat kreiran kao Andorid projekat 
+// 2. verziju Gradle-a u gradle -> wrapper -> gradle-wrapper.properties
+// 3. da li je putanja do Android SDK ispravna u local.properties
 //ako je ovo sve ispravno, ne bi trebalo biti problema oko pokretanja i kreiranja izvjestaja
 
 public class SpotBugs {
