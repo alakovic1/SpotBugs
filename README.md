@@ -7,20 +7,21 @@
 ## Prerequisites
 
 1. Java 8 installed (it should work on higher versions too)
-2. Android Studio installed, or Gradle (must be version 5+)
-3. have projects you want to test
+2. Android Studio installed, with Gradle
+3. have Android projects you want to test (all projects need to be created as Android Studio projects)
+4. Android projects need to have path to your local Android SDK and use Gradle 5+ because SpotBugs doesn't support lower versions
 
 ## Running SpotBugs
 
 1. Clone this repository (or fork and clone)
-2. Add paths to all the projects you want to test in putanje.txt
-3. putanje.txt and script need to be in the same directory
+2. Add paths to all the projects you want to test in paths.txt
+3. paths.txt and script need to be in the same directory
 4. Open Terminal in that directory and run commands:
-    1. javac SpotBugsSkripta.java
-    2. java SpotBugsSkripta
+    1. javac SpotBugs.java
+    2. java SpotBugs
 5. Wait to see if BUILDs are SUCCESSFUL (for all of your projects)
 6. HTML reports will be in every project in project -> app -> build -> SpotBugsReports!!
-7. Script creates finalReport.html where you can see total amount of warnings for every project and also access all the individual project reports.
+7. Script creates and opens (when it's finished) FinalReport.html where you can see total amount of warnings for every project and also access all the individual project reports 
 
 > You can run it as many times as you want to, no need to delete code by hand because it is not going to insert the same code several times. It should be fine every time you try.
 
