@@ -10,24 +10,33 @@ import java.awt.Desktop;
 //u svaki projekat u tom folderu ce biti testiran SpotBugs i izvjestaj ce biti kreiran
 //za svaki projekat ce u konzoli biti ispis da li je BUILD uspjesno zavrsen
 //nakon zavrsetka skripte otvorice se html file koji predstavlja finalni izvjestaj za sve projekte
-//u tom izvjestaju ce pisati broj warninga, koji su to i koliko je linija analizirano
+//u tom izvjestaju ce pisati broj warningsa, koji su to i koliko je linija analizirano
 //te ce biti omogucen pristup originalnim izvjestajima za svaki projekat (ako postoje)
+
+//dodana je i opcija da se kreira csv file koji se moze download-ovati kroz html izvjestaj
+//ili mu se moze pristupiti kroz direktorij gdje je ova skripta
+//ovo je uradjeno da bi se izvjestaj mogao kroz csv otvoriti u Microsoft Excelu
+
 
 //NAPOMENA: 
 //prije nego pokrenete skriptu provjerite:
-// 1. da li je projekat kreiran kao Andorid projekat 
+// 1. da li je projekat kreiran kao Andorid Studio projekat i build-an barem jednom
 // 2. verziju Gradle-a u gradle -> wrapper -> gradle-wrapper.properties
 // 3. da li je putanja do Android SDK ispravna u local.properties
 //ako je ovo sve ispravno, ne bi trebalo biti problema oko pokretanja i kreiranja izvjestaja
 
 public class SpotBugs {
 
-	public static ArrayList<String> projects = new ArrayList<String>();
+	public static ArrayList<String> projects = new ArrayList<String>(); //lista svih putanja do projekata
+	public static Double totalHPW = 0.00; //Total High Priority Warnings [HPW]
+	public static Double totalMPW = 0.00; //Total Medium Priority Warnings [MPW]
+	public static Double totalHPWaverage = 0.00; //prosjecan HPW za sve projekte
+	public static Double totalMPWaverage = 0.00; //prosjecan MPW za sve projekte
 
 	public static void main(String[] args) {
 
 	    //pozivanje funkcije za citanje svih putanja projekata koji se testiraju
-	    //NAPOMENA: promijeniti putanju txt fajla ako nije u istom direktoriju kao i skripta
+	    //NAPOMENA: promijeniti putanju txt file-a ako nije u istom direktoriju kao i skripta
 	    readPaths("paths.txt");
 
 	    //pozivanje funkcija za dopisivanje u Gradle i pozivanje spotbugsa za svaki projekat
@@ -42,8 +51,18 @@ public class SpotBugs {
 		//pozivanje funkcije za kreiranje finalnog izvjestaja
 		createFinalReport();
 
-		//dodavanje teksta u kreirni finalni izvjestaj
-		addTextToFile("FinalReport.html", finalReportString()); //pozvana funkcija koja vraca cijeli string za finalni izvjestaj
+		//dodavanje teksta u kreirani finalni html izvjestaj
+		addTextToFile("FinalReport.html", finalReportHTMLString()); //pozvana funkcija koja vraca cijeli string za finalni izvjestaj
+
+		//racunanje prosjecnih HPW i MPW
+		for(int i = 0; i < projects.size(); i++){
+			countWarnings(projects.get(i) + "/app/build/SpotBugsReports/main.html");
+		}
+		totalHPWaverage = totalHPW / projects.size();
+		totalMPWaverage = totalMPW / projects.size();
+
+		//dodavanje teksta u kreirani finalni csv izvjestaj
+		addTextToFile("FinalReport.csv", finalReportCSVString()); //pozvana funkcija koja vraca cijeli string za finalni izvjestaj
 
 		//pozivanje funkcije za otvaranje finalnog izvjestaja
 		openFinalReport();
@@ -63,6 +82,7 @@ public class SpotBugs {
 			}
 			reader.close();
 		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
 			e.printStackTrace();
 		}
 
@@ -90,7 +110,7 @@ public class SpotBugs {
 				addTextToFile(gradleAppPath, gradleAppText);
 			}
 		} catch (Exception e){
-        	//izuzetak u slucaju da ne postoji file u koji se treba dodati tekst
+        	//izuzetak u slucaju da neki od file-ova ne postoje
     	}
 
 	}
@@ -110,6 +130,7 @@ public class SpotBugs {
 			}
 			reader.close();
 		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
 			e.printStackTrace();
 		}
 		return false;
@@ -137,6 +158,7 @@ public class SpotBugs {
 		} catch (Exception e){
         	//izuzetak u slucaju da file ne postoji
     	}
+
 	}
 
 	private static void executeSpotBugsCommand(String project){
@@ -175,24 +197,35 @@ public class SpotBugs {
 
 		//kreiranje file-a za finalni izvjestaj
 		try {
+			//kreiranje html izvjestaja
       		File myObj = new File("FinalReport.html");  
+      		//kreiranje csv izvjestaja
+      		File myObj2 = new File("FinalReport.csv");
 
       		//u slucaju da file vec postoji, obrise se i opet kreira
       		myObj.delete(); 
+      		myObj2.delete();
 
       		//kreiranje i ispitivanje da li je kreiran file
+      		//za html
       		if (myObj.createNewFile()) {  
         		System.out.println("File created: " + myObj.getName());  
       		} else {  
         		System.out.println("File " + myObj.getName() + " already exists.");  
       		}  
+      		//za csv
+      		if (myObj2.createNewFile()) {  
+        		System.out.println("File created: " + myObj2.getName());  
+      		} else {  
+        		System.out.println("File " + myObj2.getName() + " already exists.");  
+      		} 
     	} catch (IOException e) {
       		e.printStackTrace();  
     	} 
 
 	}
 
-	private static String finalReportString(){
+	private static String finalReportHTMLString(){
 
 		//kreiranje citavog stringa za finalni izvjestaj
 		String html = "<!DOCTYPE html\n" + 
@@ -258,6 +291,13 @@ public class SpotBugs {
 						   "project ':app' (main)</p>\n" +
 					      "<p>SpotBugs version: 4.0.1</p>\n" + 
 					      "<br>\n" +
+
+					      //dodana mogucnost skidanja csv file-a za otvaranje kroz Excel
+					      "<a href=\"FinalReport.csv\" class=\"link\">Download CSV report</a>\n" +
+					      "<br>\n" +
+					      "<br>\n" +
+
+					      //izlistavanje svih testiranih projekata
 					      "<h3>All tested projects: </h3>\n" + 
 					      "<p>\n";
 
@@ -321,6 +361,63 @@ public class SpotBugs {
 
 	}
 
+	private static String finalReportCSVString(){
+
+		//kreiranje citavog stringa za finalni izvjestaj
+		//zaglavlje
+		String csv = " , Project, High Priority Warnings [HPW], Medium Priority Warnings [MPW], HPW/Average HPW, MPW/Average MPW\n";
+		
+		csv += "\n";
+
+		//slucaj kada nema projekata
+		if(projects.size() == 0){
+			csv += ", NO PROJECTS!!\n";
+			csv += ", Please fill paths.txt file with paths to projects you want to test.\n";
+		}
+
+		//dodavanje svih projekata
+		for(int i = 0; i < projects.size(); i++){ 
+			try{
+				//slucaj kada je doslo do greske i spotbugs izvjestaj nije kreiran
+				if(getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html") == -1 || getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html") == -1){
+					csv += "," + projects.get(i) + ", /, /, /, /, SpotBugsReport not found!\n";
+				}
+				else{
+					//dodavanje u string
+					csv += " ," + projects.get(i) + ", " + getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html") + ", " + getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html") + ", ";
+					
+					//u slucaju da dodje do dijeljenja sa nulom
+					if(totalHPWaverage == 0.00 && totalMPWaverage == 0.00){
+						csv += "CAN'T DIVIDE BY ZERO!!!, CAN'T DIVIDE BY ZERO!!!\n";
+					}
+					else if(totalHPWaverage == 0.00 && totalMPWaverage != 0.00){
+						csv += "CAN'T DIVIDE BY ZERO!!!, " + getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage + "\n";
+					}
+					else if(totalHPWaverage != 0.00 && totalMPWaverage == 0.00){
+						csv += getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage +", CAN'T DIVIDE BY ZERO!!!\n";
+					}
+					//ako se ne dijeli sa nulom
+					else{
+						csv += getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage + ", " + getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage + "\n";
+					}
+				}
+			} catch(Exception e){
+				//izuzetak u slucaju da neki od file-ova ne postoje
+			}
+		}
+
+		//u slucaju da nema projekata nema smisla da se ovo ispisuje
+		if(projects.size() != 0){
+			csv += "\n";
+			//ispis ukupnog zbira oba Priority Warningsa
+			csv += "Total PW, , " + totalHPW + ", " + totalMPW + "\n";
+			//ispis prosjecnog iznosa za oba Priority Warningsa
+			csv += "Average PW, ," + totalHPWaverage + ", " + totalMPWaverage;
+		}
+		return csv;
+
+	}
+
 	private static ArrayList<String> getWarnings(String path){
 
 		//kupljenje informacija iz pojedinacnih izvjestaja za finalni izvjestaj
@@ -372,6 +469,7 @@ public class SpotBugs {
 			return list;
 
 		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
 			e.printStackTrace();
 		}
 		return null;
@@ -400,6 +498,122 @@ public class SpotBugs {
 	        }
     	}
     	catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static Integer getHPW(String path){
+
+		//kupljenje koliko je High Priority Warningsa za svaki projekat
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(path));
+			String line = reader.readLine();
+			while (line != null) {
+				if(line.equals("            <td>High Priority Warnings</td>")){
+					String warningLine = reader.readLine();
+					String[] firstSplit = warningLine.split(">", 2); //prvi split
+					String[] secondSplit = firstSplit[1].split("<", 2); //drugi i finalni split
+					Integer number = 0;
+					try{ 
+						number = Integer.parseInt(secondSplit[0]);
+					}
+					catch (Exception e) {
+						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
+						number = 0;
+					}
+					return number;
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
+			e.printStackTrace();
+			return -1;
+		}
+		return 0;
+
+	}
+
+	public static Integer getMPW(String path){
+
+		//kupljenje koliko je Medium Priority Warningsa za svaki projekat
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(path));
+			String line = reader.readLine();
+			while (line != null) {
+				if(line.equals("            <td>Medium Priority Warnings</td>")){
+					String warningLine = reader.readLine();
+					String[] firstSplit = warningLine.split(">", 2); //prvi split
+					String[] secondSplit = firstSplit[1].split("<", 2); //drugi i finalni split
+					Integer number = 0;
+					try{ 
+						number = Integer.parseInt(secondSplit[0]);
+					}
+					catch (Exception e) {
+						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
+						number = 0;
+					}
+					return number;
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
+			e.printStackTrace();
+			return -1;
+		}
+		return 0;
+		
+	}
+
+	public static void countWarnings(String path){
+
+		//racunanje Priority Warningsa za sve projekte
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(path));
+			String line = reader.readLine();
+			while (line != null) {
+				//HPW
+				if(line.equals("            <td>High Priority Warnings</td>")){
+					String warningLine = reader.readLine();
+					String[] firstSplit = warningLine.split(">", 2); //prvi split
+					String[] secondSplit = firstSplit[1].split("<", 2); //drugi i finalni split
+					Integer number = 0;
+					try{ 
+						number = Integer.parseInt(secondSplit[0]);
+					}
+					catch (Exception e) {
+						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
+						number = 0;
+					}
+					totalHPW += number;
+				}
+				//MPW
+				if(line.equals("            <td>Medium Priority Warnings</td>")){
+					String warningLine = reader.readLine();
+					String[] firstSplit = warningLine.split(">", 2); //prvi split
+					String[] secondSplit = firstSplit[1].split("<", 2); //drugi i finalni split
+					Integer number = 0;
+					try{ 
+						number = Integer.parseInt(secondSplit[0]);
+					}
+					catch (Exception e) {
+						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
+						number = 0;
+					}
+					totalMPW += number;
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+		} catch (IOException e) {
+			//izuzetak u slucaju da file ne postoji
 			e.printStackTrace();
 		}
 
