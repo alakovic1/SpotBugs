@@ -32,6 +32,8 @@ public class SpotBugs {
 	public static Double totalMPW = 0.00; //Total Medium Priority Warnings [MPW]
 	public static Double totalHPWaverage = 0.00; //prosjecan HPW za sve projekte
 	public static Double totalMPWaverage = 0.00; //prosjecan MPW za sve projekte
+	public static int numberOfHPW = 0; //broj projekata koji imaju HPW
+	public static int numberOfMPW = 0; //broj projekata koji imaju MPW
 
 	public static void main(String[] args) {
 
@@ -58,8 +60,16 @@ public class SpotBugs {
 		for(int i = 0; i < projects.size(); i++){
 			countWarnings(projects.get(i) + "/app/build/SpotBugsReports/main.html");
 		}
-		totalHPWaverage = totalHPW / projects.size();
-		totalMPWaverage = totalMPW / projects.size();
+		//racuanje prosjecnog broja warningsa
+		totalHPWaverage = Math.round((totalHPW / numberOfHPW)*100.00)/100.00;
+		totalMPWaverage = Math.round((totalMPW / numberOfMPW)*100.00)/100.00;
+		//uzeti u obzir svi slucajevi, da ne bi doslo do NaN ispisa
+		if(numberOfHPW == 0){
+			totalHPWaverage = 0.00;
+		}
+		if(numberOfMPW == 0){
+			totalMPWaverage = 0.00;
+		}
 
 		//dodavanje teksta u kreirani finalni csv izvjestaj
 		addTextToFile("FinalReport.csv", finalReportCSVString()); //pozvana funkcija koja vraca cijeli string za finalni izvjestaj
@@ -388,17 +398,17 @@ public class SpotBugs {
 					
 					//u slucaju da dodje do dijeljenja sa nulom
 					if(totalHPWaverage == 0.00 && totalMPWaverage == 0.00){
-						csv += "CAN'T DIVIDE BY ZERO!!!, CAN'T DIVIDE BY ZERO!!!\n";
+						csv += "ERROR: division by zero!, ERROR: division by zero!\n";
 					}
 					else if(totalHPWaverage == 0.00 && totalMPWaverage != 0.00){
-						csv += "CAN'T DIVIDE BY ZERO!!!, " + getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage + "\n";
+						csv += "ERROR: division by zero!, " + Math.round((getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage)*100.00)/100.00 + "\n";
 					}
 					else if(totalHPWaverage != 0.00 && totalMPWaverage == 0.00){
-						csv += getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage +", CAN'T DIVIDE BY ZERO!!!\n";
+						csv += Math.round((getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage)*100.00)/100.00 +", ERROR: division by zero!\n";
 					}
 					//ako se ne dijeli sa nulom
 					else{
-						csv += getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage + ", " + getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage + "\n";
+						csv += Math.round((getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage)*100.00)/100.00 + ", " + Math.round((getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage)*100.00)/100.00 + "\n";
 					}
 				}
 			} catch(Exception e){
@@ -592,7 +602,11 @@ public class SpotBugs {
 						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
 						number = 0;
 					}
-					totalHPW += number;
+					//racunaju se samo projekti koji imaju neki warning
+					if(number != 0){
+						numberOfHPW++;
+						totalHPW += number;
+					}
 				}
 				//MPW
 				if(line.equals("            <td>Medium Priority Warnings</td>")){
@@ -607,7 +621,11 @@ public class SpotBugs {
 						//u slucaju da se ne moze parsirati string u int jer se nula ne prikazuje u izvjestaju
 						number = 0;
 					}
-					totalMPW += number;
+					//racunaju se samo projekti koji imaju neki warning
+					if(number != 0){
+						numberOfMPW++;
+						totalMPW += number;
+					}
 				}
 				line = reader.readLine();
 			}
