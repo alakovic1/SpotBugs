@@ -398,13 +398,13 @@ public class SpotBugs {
 					
 					//u slucaju da dodje do dijeljenja sa nulom
 					if(totalHPWaverage == 0.00 && totalMPWaverage == 0.00){
-						csv += "ERROR: division by zero!, ERROR: division by zero!\n";
+						csv += "0, 0\n";
 					}
 					else if(totalHPWaverage == 0.00 && totalMPWaverage != 0.00){
-						csv += "ERROR: division by zero!, " + Math.round((getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage)*100.00)/100.00 + "\n";
+						csv += "0, " + Math.round((getMPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalMPWaverage)*100.00)/100.00 + "\n";
 					}
 					else if(totalHPWaverage != 0.00 && totalMPWaverage == 0.00){
-						csv += Math.round((getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage)*100.00)/100.00 +", ERROR: division by zero!\n";
+						csv += Math.round((getHPW(projects.get(i) + "/app/build/SpotBugsReports/main.html")/totalHPWaverage)*100.00)/100.00 +", 0\n";
 					}
 					//ako se ne dijeli sa nulom
 					else{
