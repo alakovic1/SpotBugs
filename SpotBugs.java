@@ -113,7 +113,7 @@ public class SpotBugs {
 
 			//dodavanje u build.gradle app
 			String gradleAppPath = project + "/app/build.gradle";
-			String gradleAppText = "\napply plugin: \"com.github.spotbugs\"\nsourceSets {\nmain {\njava.srcDirs = []\n}\n}\nspotbugs {\ntoolVersion = \'4.0.1\'\nignoreFailures = true\nreportsDir = file(\"$project.buildDir/SpotBugsReports\")\neffort = \"max\"\nreportLevel = \"high\"\n}\ntasks.withType(com.github.spotbugs.SpotBugsTask) {\ndependsOn 'assembleDebug'\nclasses = files(\"$project.buildDir/intermediates/javac\")\nsource = fileTree('src/main/java')\nreports {\nhtml.enabled = true\nxml.enabled = false\n}\n}";
+			String gradleAppText = "\napply plugin: \"com.github.spotbugs\"\nsourceSets {\nmain {\njava.srcDirs = []\n}\n}\nspotbugs {\ntoolVersion = \'4.0.3\'\nignoreFailures = true\nreportsDir = file(\"$project.buildDir/SpotBugsReports\")\neffort = \"max\"\nreportLevel = \"high\"\n}\ntasks.withType(com.github.spotbugs.SpotBugsTask) {\ndependsOn 'assembleDebug'\nclasses = files(\"$project.buildDir/intermediates/javac\")\nsource = fileTree('src/main/java')\nreports {\nhtml.enabled = true\nxml.enabled = false\n}\n}";
 
 			//ispitivanje da li je vec dodan spotbugs u app
 			if(SpotBugsInGradleExists(gradleAppPath, "apply plugin: \"com.github.spotbugs\"") == false){
@@ -299,7 +299,7 @@ public class SpotBugs {
 					      "<h2>Basic Information</h2>\n" + 
 					      "<p>Project: \n" + 
 						   "project ':app' (main)</p>\n" +
-					      "<p>SpotBugs version: 4.0.1</p>\n" + 
+					      "<p>SpotBugs version: 4.0.3</p>\n" + 
 					      "<br>\n" +
 
 					      //dodana mogucnost skidanja csv file-a za otvaranje kroz Excel
