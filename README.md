@@ -1,6 +1,6 @@
 # SpotBugs
 
-> [SpotBugs](https://spotbugs.github.io/) is a static analysis tool that looks for potential bugs in Java code. It can be used in both pure Java, and Android Java projects.
+> [SpotBugs](https://spotbugs.github.io/) is a static analysis tool that looks for potential bugs in Java code. It can be used in both pure Java, and Android Java projects. 
 
 > In this project, SpotBugs is used to analyse several Android Java projects at once.
 
